@@ -204,7 +204,7 @@ export default class HomeScreen extends React.Component {
       return <Spinner />;
     }
 
-    const topMarkers = this._calculateOrderedMarkers(
+    const topMarkers = HomeScreen._calculateOrderedMarkers(
       markers,
       location,
     ).filter(marker => marker.distance <= 1000 * 500);

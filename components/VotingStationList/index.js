@@ -171,5 +171,9 @@ VotingStationList.propTypes = {
   onShowRoute: PropTypes.func.isRequired,
   onSelectedItem: PropTypes.func.isRequired,
   // eslint-disable-next-line react/forbid-prop-types
-  selected: PropTypes.object.isRequired,
+  selected: PropTypes.object,
+};
+
+VotingStationList.defaultProps = {
+  selected: null,
 };

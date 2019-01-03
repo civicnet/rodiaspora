@@ -126,9 +126,14 @@ Map.propTypes = {
   // eslint-disable-next-line react/forbid-prop-types
   center: PropTypes.object.isRequired,
   // eslint-disable-next-line react/forbid-prop-types
-  selected: PropTypes.object.isRequired,
+  selected: PropTypes.object,
   // eslint-disable-next-line react/forbid-prop-types
-  showDirections: PropTypes.object.isRequired,
+  showDirections: PropTypes.object,
   onPress: PropTypes.func.isRequired,
   onSelectedItem: PropTypes.func.isRequired,
+};
+
+Map.defaultProps = {
+  selected: null,
+  showDirections: null,
 };
