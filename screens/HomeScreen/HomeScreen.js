@@ -17,6 +17,7 @@ import {
   Container,
   Text,
   Spinner,
+  Content,
 } from 'native-base';
 
 import Directions from '@mapbox/mapbox-sdk/services/directions';
@@ -24,6 +25,7 @@ import { sha256 } from 'js-sha256';
 import { oneLineTrim } from 'common-tags';
 
 import Map from '../../components/Map';
+import MapSearch from '../../components/MapSearch';
 import VotingStationList from '../../components/VotingStationList';
 import Geo from '../../lib/Geo';
 
@@ -214,7 +216,10 @@ export default class HomeScreen extends React.Component {
     return (
       <Container>
         <StatusBar hidden />
-        <View style={{ flex: 1 }}>
+        <MapSearch
+          geocode={locationGeocode}
+        />
+        <Content style={{ flex: 1 }}>
           <View style={{ flex: 1 }}>
             <Map
               markers={topMarkers}
@@ -234,7 +239,7 @@ export default class HomeScreen extends React.Component {
               forceShow={this._forceShowCardList}
             />
           </View>
-        </View>
+        </Content>
       </Container>
     );
   }
