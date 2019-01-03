@@ -11,6 +11,8 @@ import {
 import polyline from '@mapbox/polyline';
 
 import Uber from './styles/Uber.json';
+import MapPinOutline from '../../assets/images/vote-s-yellow-alt.png';
+import MapPinSelected from '../../assets/images/vote-s-yellow.png';
 
 const { width, height } = Dimensions.get('window');
 const ASPECT_RATIO = width / height;
@@ -100,16 +102,16 @@ export default class Map extends Component {
         showsUserLocation
       >
         {markers.map((marker) => {
-          const color = selected && marker.id === selected.id
-            ? '#0f0'
-            : '#f00';
+          const image = selected && marker.id === selected.id
+            ? MapPinSelected
+            : MapPinOutline;
 
           return (
             <MapView.Marker
-              pinColor={color}
               key={Math.random()}
               onPress={e => this._onMarkerPress(e.nativeEvent, marker)}
               coordinate={{ ...marker }}
+              image={image}
             >
             </MapView.Marker>
           );
