@@ -40,7 +40,7 @@ export default class VotingStationCard extends Component {
 
   async _getPhotosAsync(coords) {
     this.flickr = new Flickr(coords);
-    const photoURL = await this.flickr.getRandomPhoto('station');
+    const photoURL = await this.flickr.getRandomPhoto(5);
     this.setState({
       photoURL,
     });
