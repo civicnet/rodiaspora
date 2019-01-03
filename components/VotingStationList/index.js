@@ -23,7 +23,7 @@ export default class VotingStationList extends React.Component {
   bottomMargin = new Animated.Value(0);
 
   viewabilityConfig = {
-    viewAreaCoveragePercentThreshold: 80,
+    itemVisiblePercentThreshold: 60,
     waitForInteraction: false,
   }
 
