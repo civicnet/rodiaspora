@@ -220,13 +220,13 @@ export default class HomeScreen extends React.Component {
               selected={selectedMarker}
               onSelectedItem={this._onSelectedItem}
               showDirections={currentDirections}
-              onPress={this._onMapPress.bind}
+              onPress={this._onMapPress}
             />
             <VotingStationList
               markers={topMarkers}
               selected={selectedMarker}
               onSelectedItem={this._onSelectedItem}
-              onShowRoute={this._onShowRoute.bind}
+              onShowRoute={this._onShowRoute}
               showDirections={currentDirections}
               hidden={isCardListHidden}
             />
