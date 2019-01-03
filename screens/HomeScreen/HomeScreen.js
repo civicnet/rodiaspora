@@ -183,6 +183,8 @@ export default class HomeScreen extends React.Component {
     });
   }
 
+  _forceShowCardList = () => this.setState({ isCardListHidden: false });
+
   render() {
     const {
       errorMessage,
@@ -229,6 +231,7 @@ export default class HomeScreen extends React.Component {
               onShowRoute={this._onShowRoute}
               showDirections={currentDirections}
               hidden={isCardListHidden}
+              forceShow={this._forceShowCardList}
             />
           </View>
         </View>

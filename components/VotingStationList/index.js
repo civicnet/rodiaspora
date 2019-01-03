@@ -65,11 +65,18 @@ export default class VotingStationList extends React.Component {
     const { onSelectedItem } = this.props;
     if (onSelectedItem) {
       onSelectedItem(viewableItems[0].item);
-      // this.flatList.scrollToIndex({ index: viewableItems[0].index });
     }
   }
 
   _onChangeSelected = (item, index) => {
+    // If we're "reselecting" the same pin, the "hidden" prop doesn't get updated
+    const { selectedMarkerIndex } = this.state;
+    const { forceShow } = this.props;
+
+    if (selectedMarkerIndex === index) {
+      // this._animateSwipeUp();
+      forceShow();
+    }
     this.flatList.scrollToIndex({ index });
   };
 
@@ -170,6 +177,7 @@ VotingStationList.propTypes = {
   hidden: PropTypes.bool.isRequired,
   onShowRoute: PropTypes.func.isRequired,
   onSelectedItem: PropTypes.func.isRequired,
+  forceShow: PropTypes.func.isRequired,
   // eslint-disable-next-line react/forbid-prop-types
   selected: PropTypes.object,
 };
