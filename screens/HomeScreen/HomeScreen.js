@@ -141,7 +141,7 @@ export default class HomeScreen extends React.Component {
 
   _onShowRoute = async (marker) => {
     const { location } = this.state;
-    const cacheKey = this._getRouteCacheKey(
+    const cacheKey = HomeScreen._getRouteCacheKey(
       marker,
       {
         latitude: location.coords.latitude,
