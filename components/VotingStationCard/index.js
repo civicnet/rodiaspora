@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 
 import {
   StyleSheet,
+  View,
 } from 'react-native';
 
 import ImageOverlay from 'react-native-image-overlay';
@@ -13,8 +14,7 @@ import {
   Text,
   Button,
   Icon,
-  Left,
-  Body,
+  Right,
 } from 'native-base';
 
 import Flickr from '../../lib/Flickr';
@@ -79,16 +79,16 @@ export default class VotingStationCard extends Component {
 
     return (
       <Card style={{ opacity: highlighted ? 1 : 0.5 }}>
-        <CardItem>
-          <Left>
+        <CardItem header>
+          <View style={{ flexGrow: 1 }}>
+            <Text>{name}</Text>
+            <Text note>{`${country}, approx. ${distance} km`}</Text>
+          </View>
+          <Right style={{ flexShrink: 1 }}>
             <Button iconLeft transparent primary onPress={() => onShowRoute(coords)}>
-              <Icon name="map-o" type="FontAwesome" />
+              <Icon name="ellipsis-v" type="FontAwesome" />
             </Button>
-            <Body>
-              <Text>{name}</Text>
-              <Text note>{`${country}, approx. ${distance} km`}</Text>
-            </Body>
-          </Left>
+          </Right>
         </CardItem>
         <CardItem cardBody style={{ height }}>
           { image }
