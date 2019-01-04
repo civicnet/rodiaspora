@@ -73,17 +73,6 @@ export default class DistanceSlider extends Component {
 
     return (
       <View style={[styles.sliderContainer, style]}>
-        <Slider
-          style={styles.slider}
-          maximumValue={maxDistance}
-          minimumValue={minDistance}
-          step={step}
-          value={distance}
-          onValueChange={val => this.setState({ distance: val })}
-          thumbTintColor="#FDD835"
-          maximumTrackTintColor="#F57F17"
-          minimumTrackTintColor="#FDD835"
-        />
         <View style={styles.textCon}>
           <Text style={styles.colorGrey}>
             <Text style={[styles.sliderNumber, styles.colorGrey]}>100</Text>
@@ -98,6 +87,17 @@ export default class DistanceSlider extends Component {
             km
           </Text>
         </View>
+        <Slider
+          style={styles.slider}
+          maximumValue={maxDistance}
+          minimumValue={minDistance}
+          step={step}
+          value={distance}
+          onValueChange={val => this.setState({ distance: val })}
+          thumbTintColor="#FDD835"
+          maximumTrackTintColor="#F57F17"
+          minimumTrackTintColor="#FDD835"
+        />
       </View>
     );
   }
