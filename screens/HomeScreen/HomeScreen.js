@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import {
   Platform,
@@ -222,6 +223,14 @@ export default class HomeScreen extends React.Component {
 
   _forceShowCardList = () => this.setState({ isCardListMinimized: false });
 
+  _openDrawer = () => {
+    const {
+      navigation,
+    } = this.props;
+
+    navigation.toggleDrawer();
+  }
+
   render() {
     const {
       errorMessage,
@@ -260,6 +269,7 @@ export default class HomeScreen extends React.Component {
         <MapSearch
           geocode={locationGeocode}
           ref={(ref) => { this.mapSearch = ref; }}
+          onOpenDrawer={this._openDrawer}
         />
         <Content style={{ flex: 1 }}>
           <View style={{ flex: 1 }}>
@@ -286,3 +296,8 @@ export default class HomeScreen extends React.Component {
     );
   }
 }
+
+HomeScreen.propTypes = {
+  // eslint-disable-next-line react/forbid-prop-types
+  navigation: PropTypes.object.isRequired,
+};

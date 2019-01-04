@@ -18,6 +18,10 @@ export default class App extends React.Component {
       ...Icon.Ionicons.font,
       /* eslint-disable */
       Roboto: require('native-base/Fonts/Roboto.ttf'),
+      RobotoSlab: require('./assets/fonts/RobotoSlab-Regular.ttf'),
+      RobotoSlab_light: require('./assets/fonts/RobotoSlab-Light.ttf'),
+      RobotoSlab_bold: require('./assets/fonts/RobotoSlab-Bold.ttf'),
+      RobotoSlab_thin: require('./assets/fonts/RobotoSlab-Thin.ttf'),
       Roboto_medium: require('native-base/Fonts/Roboto_medium.ttf'),
       /* eslint-enable */
     }),

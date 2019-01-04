@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import {
   Image,
   ImageBackground,
+  StyleSheet,
 } from 'react-native';
 
 import {
@@ -11,10 +12,45 @@ import {
   Content,
   Text,
   List,
+  Footer,
+  FooterTab,
   ListItem,
 } from 'native-base';
 
-const routes = ['Home', 'Chat', 'Profile'];
+import Logo from '../../assets/images/passport.png';
+
+const styles = StyleSheet.create({
+  title: {
+    color: '#fff',
+    fontSize: 26,
+    fontFamily: 'RobotoSlab',
+    marginTop: 10,
+  },
+  footerTab: {
+    backgroundColor: '#fff',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  footerText: {
+    fontSize: 12,
+    color: '#999',
+  },
+});
+
+const routes = [
+  {
+    name: 'Secții vot',
+    route: 'Home',
+  },
+  {
+    name: 'Știri',
+    route: 'News',
+  },
+  {
+    name: 'Despre',
+    route: 'About',
+  },
+];
 
 const Sidebar = ({ navigation }) => (
   <Container>
@@ -32,24 +68,32 @@ const Sidebar = ({ navigation }) => (
       >
         <Image
           square
-          style={{ height: 80, width: 70 }}
-          source={{
-            uri: 'https://raw.githubusercontent.com/gov-ithub/ro-diaspora/master/resources/android/icon/drawable-xxhdpi-icon.png',
-          }}
+          style={{ height: 50, width: 50 }}
+          source={Logo}
         />
+        <Text style={styles.title}>
+          RODiaspora
+        </Text>
       </ImageBackground>
       <List
         dataArray={routes}
         renderRow={data => (
           <ListItem
             button
-            onPress={() => navigation.navigate(data)}
+            onPress={() => navigation.navigate(data.route)}
           >
-            <Text>{data}</Text>
+            <Text>{data.name}</Text>
           </ListItem>
         )}
       />
     </Content>
+    <Footer>
+      <FooterTab style={styles.footerTab}>
+        <Text style={styles.footerText}>
+          Copyright @ 2019 / CivicTech România
+        </Text>
+      </FooterTab>
+    </Footer>
   </Container>
 );
 

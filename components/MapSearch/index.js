@@ -44,12 +44,13 @@ export default class MapSearch extends Component {
   render() {
     const {
       geocode,
+      onOpenDrawer,
     } = this.props;
 
     return (
       <View style={styles.container}>
         <LocationAutocomplete geocode={geocode} ref={(ref) => { this.autocomplete = ref; }} />
-        <Button transparent dark style={styles.button}>
+        <Button transparent dark style={styles.button} onPress={onOpenDrawer}>
           <Icon name="bars" type="FontAwesome" style={styles.icon} />
         </Button>
       </View>
@@ -60,4 +61,5 @@ export default class MapSearch extends Component {
 MapSearch.propTypes = {
   // eslint-disable-next-line react/forbid-prop-types
   geocode: PropTypes.object.isRequired,
+  onOpenDrawer: PropTypes.func.isRequired,
 };
