@@ -33,6 +33,7 @@ import MapSearch from '../../components/MapSearch';
 import VotingStationList from '../../components/VotingStationList';
 import LocationErrorCard from '../../components/LocationErrorCard';
 import Geo from '../../lib/Geo';
+import DefaultCoords from '../../constants/DefaultCoords';
 
 import * as MarkerLocations from '../../assets/data/markers-data.json';
 
@@ -52,6 +53,26 @@ const styles = StyleSheet.create({
     left: (width / 2) - 18,
   },
 });
+
+const MARKERS = (() => {
+  const markers = Object.keys(MarkerLocations).map((key) => {
+    const obj = MarkerLocations[key];
+    if (!obj || !obj.coords) {
+      return null;
+    }
+
+    return {
+      name: obj.name,
+      address: obj.address,
+      country: obj.country,
+      latitude: Number(obj.coords.lat),
+      longitude: Number(obj.coords.lng),
+      id: sha256(`${obj.name}:${obj.address}`),
+    };
+  });
+
+  return markers.filter(coords => coords != null);
+})();
 
 export default class HomeScreen extends React.Component {
   static _calculateOrderedMarkers(markers, location) {
@@ -92,38 +113,36 @@ export default class HomeScreen extends React.Component {
     errorMessage: null,
     location: null,
     locationGeocode: null,
-    markers: [],
     selectedMarker: null,
     currentDirections: null,
     isCardListMinimized: false,
   }
 
   componentWillMount() {
+    const { location } = this.state;
+
+    if (location) {
+      return;
+    }
+
     if (Platform.OS === 'android' && !Constants.isDevice) {
       this.setState({
         errorMessage: 'Oops, this will not work on Sketch in an Android emulator. Try it on your device!',
       });
-    } else {
-      this._getLocationAsync();
     }
 
-    const markers = Object.keys(MarkerLocations).map((key) => {
-      const obj = MarkerLocations[key];
-      if (!obj || !obj.coords) {
-        return null;
-      }
+    this._getLocationAsync();
+  }
 
-      return {
-        name: obj.name,
-        address: obj.address,
-        country: obj.country,
-        latitude: Number(obj.coords.lat),
-        longitude: Number(obj.coords.lng),
-        id: sha256(`${obj.name}:${obj.address}`),
-      };
-    });
+  _getTopMarkers = () => {
+    const { location } = this.state;
 
-    this.setState({ markers: markers.filter(coords => coords != null) });
+    const topMarkers = HomeScreen._calculateOrderedMarkers(
+      MARKERS,
+      location,
+    ).filter(marker => marker.distance <= 1000 * 1000);
+
+    return topMarkers;
   }
 
   _getLocationAsync = async () => {
@@ -164,6 +183,10 @@ export default class HomeScreen extends React.Component {
       country: geocodeResponse.body.features[0].context[2].text,
       address: geocodeResponse.body.features[0].properties.address,
       name: geocodeResponse.body.features[0].place_name,
+      coords: {
+        longitude: location.coords.longitude,
+        latitude: location.coords.latitude,
+      },
     };
 
     this.setState({ location, locationGeocode });
@@ -238,30 +261,27 @@ export default class HomeScreen extends React.Component {
     navigation.toggleDrawer();
   }
 
+  _overrideLocation = (coords, geocode) => {
+    this.setState({
+      location: coords,
+      locationGeocode: geocode,
+    });
+  }
+
   render() {
     const {
       errorMessage,
       location,
       locationGeocode,
-      markers,
       selectedMarker,
       currentDirections,
       isCardListMinimized,
     } = this.state;
 
-    const defaultCoords = {
-      latitude: 48.0994207,
-      longitude: 4.1512819,
-    };
-
     let topMarkers = [];
     if (location) {
-      topMarkers = HomeScreen._calculateOrderedMarkers(
-        markers,
-        location,
-      ).filter(marker => marker.distance <= 1000 * 500);
+      topMarkers = this._getTopMarkers();
     }
-
     let stationList = null;
 
     if (errorMessage) {
@@ -292,12 +312,14 @@ export default class HomeScreen extends React.Component {
           geocode={locationGeocode}
           ref={(ref) => { this.mapSearch = ref; }}
           onOpenDrawer={this._openDrawer}
+          overrideLocation={this._overrideLocation}
         />
       )
       : (
         <MapSearch
           ref={(ref) => { this.mapSearch = ref; }}
           onOpenDrawer={this._openDrawer}
+          overrideLocation={this._overrideLocation}
         />
       );
 
@@ -309,7 +331,7 @@ export default class HomeScreen extends React.Component {
           <View style={{ flex: 1 }}>
             <Map
               markers={topMarkers}
-              center={location ? location.coords : defaultCoords}
+              center={location ? location.coords : DefaultCoords}
               selected={selectedMarker}
               onSelectedItem={this._onSelectedItem}
               showDirections={currentDirections}

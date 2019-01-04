@@ -77,7 +77,7 @@ export default class LocationAutocomplete extends Component {
 
     // URL escaped, UTF-8
     const escapedQuery = unescape(encodeURIComponent(cleanQuery));
-    const countWords = cleanQuery.match(/(\w+)/g).length;
+    const countWords = cleanQuery.split(' ').length;
     if (countWords < 20 && escapedQuery < 256) {
       return escapedQuery;
     }
@@ -151,11 +151,39 @@ export default class LocationAutocomplete extends Component {
   };
 
   _selectSuggestion = (suggestion) => {
+    const {
+      overrideLocation,
+    } = this.props;
+
     this.setState({
-      autoLocation: suggestion,
+      autoLocation: suggestion.place_name,
       suggestions: null,
     });
     Keyboard.dismiss();
+
+    const newCoords = {
+      coords: {
+        latitude: suggestion.center[1],
+        longitude: suggestion.center[0],
+      },
+    };
+
+    let country = null;
+    const city = suggestion.text;
+    suggestion.context.forEach((value) => {
+      if (value.id.substr(0, 7) === 'country') {
+        country = value.text;
+      }
+    });
+
+    overrideLocation(
+      newCoords,
+      {
+        city,
+        country,
+        coords: newCoords,
+      },
+    );
   }
 
   _geocodeToString = () => {
@@ -183,7 +211,7 @@ export default class LocationAutocomplete extends Component {
           renderItem={({ item, index }) => (
             <TouchableOpacity
               style={index !== 0 ? styles.autocompleteItem : styles.autocompleteFirstItem}
-              onPress={() => this._selectSuggestion(item.place_name)}
+              onPress={() => this._selectSuggestion(item)}
             >
               <Text>{item.place_name}</Text>
             </TouchableOpacity>
@@ -230,4 +258,5 @@ export default class LocationAutocomplete extends Component {
 LocationAutocomplete.propTypes = {
   // eslint-disable-next-line react/forbid-prop-types
   geocode: PropTypes.object.isRequired,
+  overrideLocation: PropTypes.func.isRequired,
 };

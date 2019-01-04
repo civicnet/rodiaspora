@@ -13,6 +13,7 @@ import {
 } from 'native-base';
 
 import LocationAutocomplete from '../LocationAutocomplete';
+import DefaultCoords from '../../constants/DefaultCoords';
 
 const { width } = Dimensions.get('window');
 
@@ -45,11 +46,16 @@ export default class MapSearch extends Component {
     const {
       geocode,
       onOpenDrawer,
+      overrideLocation,
     } = this.props;
 
     return (
       <View style={styles.container}>
-        <LocationAutocomplete geocode={geocode} ref={(ref) => { this.autocomplete = ref; }} />
+        <LocationAutocomplete
+          geocode={geocode}
+          ref={(ref) => { this.autocomplete = ref; }}
+          overrideLocation={overrideLocation}
+        />
         <Button transparent dark style={styles.button} onPress={onOpenDrawer}>
           <Icon name="bars" type="FontAwesome" style={styles.icon} />
         </Button>
@@ -62,6 +68,7 @@ MapSearch.propTypes = {
   // eslint-disable-next-line react/forbid-prop-types
   geocode: PropTypes.object,
   onOpenDrawer: PropTypes.func.isRequired,
+  overrideLocation: PropTypes.func.isRequired,
 };
 
 MapSearch.defaultProps = {
@@ -69,5 +76,6 @@ MapSearch.defaultProps = {
     city: null,
     country: null,
     placeholder: 'Unde vrei să votezi?',
+    coords: { ...DefaultCoords },
   },
 };
