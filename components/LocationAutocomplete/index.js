@@ -92,6 +92,13 @@ export default class LocationAutocomplete extends Component {
   state = {
     suggestions: null,
     autoLocation: null,
+    hidden: false,
+  }
+
+  hideAutocomplete = () => {
+    this.setState({
+      hidden: true,
+    });
   }
 
   _onResetLocation = () => {
@@ -107,6 +114,7 @@ export default class LocationAutocomplete extends Component {
   _clearAutoLocation = () => {
     this.setState({
       autoLocation: null,
+      hidden: false,
     });
   }
 
@@ -155,14 +163,18 @@ export default class LocationAutocomplete extends Component {
   }
 
   render() {
-    const { geocode } = this.props;
+    const {
+      geocode,
+    } = this.props;
+
     const {
       autoLocation,
       suggestions,
+      hidden,
     } = this.state;
 
     let list = null;
-    if (suggestions && suggestions.features.length) {
+    if (suggestions && suggestions.features.length && !hidden) {
       list = (
         <FlatList
           keyboardShouldPersistTaps="always"

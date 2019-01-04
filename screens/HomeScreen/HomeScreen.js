@@ -82,7 +82,7 @@ export default class HomeScreen extends React.Component {
     markers: [],
     selectedMarker: null,
     currentDirections: null,
-    isCardListHidden: false,
+    isCardListMinimized: false,
     currentlyLoading: '',
   }
 
@@ -164,14 +164,16 @@ export default class HomeScreen extends React.Component {
   _onSelectedItem = (item) => {
     this.setState({
       selectedMarker: item,
-      isCardListHidden: false,
+      isCardListMinimized: false,
     });
   }
 
   _onMapPress = () => {
     this.setState({
-      isCardListHidden: true,
+      isCardListMinimized: true,
     });
+
+    this.mapSearch.hideAutocomplete();
   }
 
   _onShowRoute = async (marker) => {
@@ -189,7 +191,7 @@ export default class HomeScreen extends React.Component {
     if (stored) {
       this.setState({
         currentDirections: JSON.parse(stored),
-        isCardListHidden: false,
+        isCardListMinimized: false,
       });
       return;
     }
@@ -214,11 +216,11 @@ export default class HomeScreen extends React.Component {
     await AsyncStorage.setItem(cacheKey, JSON.stringify(directions.body));
     this.setState({
       currentDirections: directions.body,
-      isCardListHidden: false,
+      isCardListMinimized: false,
     });
   }
 
-  _forceShowCardList = () => this.setState({ isCardListHidden: false });
+  _forceShowCardList = () => this.setState({ isCardListMinimized: false });
 
   render() {
     const {
@@ -228,7 +230,7 @@ export default class HomeScreen extends React.Component {
       markers,
       selectedMarker,
       currentDirections,
-      isCardListHidden,
+      isCardListMinimized,
       currentlyLoading,
     } = this.state;
 
@@ -257,6 +259,7 @@ export default class HomeScreen extends React.Component {
         <StatusBar hidden />
         <MapSearch
           geocode={locationGeocode}
+          ref={(ref) => { this.mapSearch = ref; }}
         />
         <Content style={{ flex: 1 }}>
           <View style={{ flex: 1 }}>
@@ -274,7 +277,7 @@ export default class HomeScreen extends React.Component {
               onSelectedItem={this._onSelectedItem}
               onShowRoute={this._onShowRoute}
               showDirections={currentDirections}
-              hidden={isCardListHidden}
+              hidden={isCardListMinimized}
               forceShow={this._forceShowCardList}
             />
           </View>

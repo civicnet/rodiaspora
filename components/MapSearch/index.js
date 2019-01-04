@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
 import {
@@ -36,18 +36,28 @@ const styles = StyleSheet.create({
   },
 });
 
-const MapSearch = ({ geocode }) => (
-  <View style={styles.container}>
-    <LocationAutocomplete geocode={geocode} />
-    <Button transparent dark style={styles.button}>
-      <Icon name="bars" type="FontAwesome" style={styles.icon} />
-    </Button>
-  </View>
-);
+export default class MapSearch extends Component {
+  hideAutocomplete = () => {
+    this.autocomplete.hideAutocomplete();
+  }
+
+  render() {
+    const {
+      geocode,
+    } = this.props;
+
+    return (
+      <View style={styles.container}>
+        <LocationAutocomplete geocode={geocode} ref={(ref) => { this.autocomplete = ref; }} />
+        <Button transparent dark style={styles.button}>
+          <Icon name="bars" type="FontAwesome" style={styles.icon} />
+        </Button>
+      </View>
+    );
+  }
+}
 
 MapSearch.propTypes = {
   // eslint-disable-next-line react/forbid-prop-types
   geocode: PropTypes.object.isRequired,
 };
-
-export default MapSearch;
