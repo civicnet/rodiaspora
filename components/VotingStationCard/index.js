@@ -20,8 +20,18 @@ import {
 import Flickr from '../../lib/Flickr';
 
 const styles = StyleSheet.create({
-  location: {
+  overlayStyle: {
+    width: '100%',
+    flex: 1,
+    alignItems: 'flex-start',
+  },
+  overlayText: {
     color: '#fff',
+  },
+  overlayItem: {
+    backgroundColor: 'transparent',
+  },
+  buttonIcon: {
     fontSize: 14,
   },
 });
@@ -56,6 +66,7 @@ export default class VotingStationCard extends Component {
       name,
       country,
       distance,
+      color,
     } = this.props;
 
     const {
@@ -69,11 +80,28 @@ export default class VotingStationCard extends Component {
         <ImageOverlay
           source={{ uri: photoURL }}
           height={height}
-          containerStyle={{ width: '100%', flex: 1 }}
-          title={address}
-          titleStyle={styles.location}
-          contentPosition="bottom"
-        />
+          containerStyle={styles.overlayStyle}
+          contentPosition="center"
+          overlayAlpha={0.7}
+          overlayColor={color}
+        >
+          <Card transparent style={{ width: '80%' }}>
+            <CardItem style={styles.overlayItem}>
+              <Icon active name="location-arrow" type="FontAwesome" style={styles.overlayText} />
+              <Text note style={styles.overlayText}>{address}</Text>
+            </CardItem>
+            <CardItem style={styles.overlayItem}>
+              <Icon active name="clock-o" type="FontAwesome" style={styles.overlayText} />
+              <Text note style={styles.overlayText}>09:00 - 18:00</Text>
+            </CardItem>
+            <CardItem style={styles.overlayItem}>
+              <Button bordered light iconRight>
+                <Text>Detalii</Text>
+                <Icon active name="chevron-right" type="FontAwesome" style={[styles.overlayText, styles.buttonIcon]} />
+              </Button>
+            </CardItem>
+          </Card>
+        </ImageOverlay>
       );
     }
 
@@ -91,7 +119,7 @@ export default class VotingStationCard extends Component {
           </Right>
         </CardItem>
         <CardItem cardBody style={{ height }}>
-          { image }
+          {image}
         </CardItem>
       </Card>
     );
@@ -108,4 +136,5 @@ VotingStationCard.propTypes = {
   name: PropTypes.string.isRequired,
   country: PropTypes.string.isRequired,
   distance: PropTypes.number.isRequired,
+  color: PropTypes.string.isRequired,
 };

@@ -15,6 +15,8 @@ import {
 } from 'native-base';
 
 import { sha256 } from 'js-sha256';
+import chroma from 'chroma-js';
+
 import VotingStationCard from '../VotingStationCard';
 
 const { height } = Dimensions.get('window');
@@ -48,6 +50,8 @@ const styles = StyleSheet.create({
 export default class VotingStationList extends React.Component {
   flatList = null;
 
+  cardColors = null;
+
   bottomMargin = new Animated.Value(0);
 
   viewabilityConfig = {
@@ -63,7 +67,14 @@ export default class VotingStationList extends React.Component {
     const {
       selected,
       hidden,
+      markers,
     } = this.props;
+
+    if (markers.length) {
+      this.cardColors = chroma
+        .scale(['#91cf60', '#ffffbf', '#fc8d59'])
+        .colors(markers.length);
+    }
 
     if (hidden && !prevProps.hidden) {
       this._animateSwipeDown();
@@ -125,6 +136,10 @@ export default class VotingStationList extends React.Component {
       onShowRoute,
     } = this.props;
 
+    const color = this.cardColors
+      ? chroma(this.cardColors[index]).darken(3).toString()
+      : '#000';
+
     return (
       <TouchableOpacity onPress={() => this._onChangeSelected(item, index)}>
         <View style={{ width: CARD_WIDTH, margin: 4 }}>
@@ -134,6 +149,7 @@ export default class VotingStationList extends React.Component {
             name={item.name}
             address={item.address}
             country={item.country}
+            color={color}
             distance={Math.floor(item.distance / 1000)}
             coords={{ latitude: item.latitude, longitude: item.longitude }}
             onShowRoute={(target, pos) => {
@@ -187,7 +203,7 @@ export default class VotingStationList extends React.Component {
           <Text style={[styles.text, styles.markerCount]}>
             {`${markers.length} `}
           </Text>
-          stații de vot, la maxim
+          stații de vot, pe o rază de
           <Text style={[styles.text, styles.distance]}>
             {` ${distance}`}
           </Text>
