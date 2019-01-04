@@ -24,23 +24,17 @@ const geocodingClient = Geocoding({
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    flexWrap: 'wrap',
   },
   item: {
     backgroundColor: '#fff',
   },
   input: {
     width: '100%',
+    paddingRight: 16,
   },
   myLocationIcon: {
-    color: '#29B6F6',
-    marginLeft: 8,
-  },
-  searchIcon: {
     color: '#37474F',
-    marginRight: 8,
-    opacity: 0.5,
+    marginLeft: 8,
   },
   autocompleteDropwdown: {
     padding: 8,
@@ -201,6 +195,10 @@ export default class LocationAutocomplete extends Component {
       hidden,
     } = this.state;
 
+    const {
+      style,
+    } = this.props;
+
     let list = null;
     if (suggestions && suggestions.features.length && !hidden) {
       list = (
@@ -221,7 +219,7 @@ export default class LocationAutocomplete extends Component {
     }
 
     return (
-      <View style={styles.container}>
+      <View style={[styles.container, style]}>
         <Item style={styles.item} elevation={3}>
           <Icon
             active
@@ -237,11 +235,6 @@ export default class LocationAutocomplete extends Component {
             ref={(ref) => { this.input = ref; }}
             value={autoLocation}
             onFocus={this._clearAutoLocation}
-          />
-          <Icon
-            name="search"
-            type="FontAwesome"
-            style={styles.searchIcon}
           />
         </Item>
         <View
@@ -259,4 +252,10 @@ LocationAutocomplete.propTypes = {
   // eslint-disable-next-line react/forbid-prop-types
   geocode: PropTypes.object.isRequired,
   overrideLocation: PropTypes.func.isRequired,
+  // eslint-disable-next-line react/forbid-prop-types
+  style: PropTypes.object,
+};
+
+LocationAutocomplete.defaultProps = {
+  style: {},
 };

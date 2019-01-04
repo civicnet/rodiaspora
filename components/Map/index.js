@@ -121,7 +121,7 @@ export default class Map extends Component {
         })}
         <MapView.Marker
           coordinate={{ ...center }}
-          image={!isError ? UserLocationPin : ErrorLocationPin}
+          image={isError ? ErrorLocationPin : UserLocationPin}
         >
         </MapView.Marker>
         {poly}

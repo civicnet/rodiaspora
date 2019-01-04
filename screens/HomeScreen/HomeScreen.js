@@ -281,7 +281,9 @@ export default class HomeScreen extends React.Component {
     let topMarkers = [];
     if (location) {
       topMarkers = this._getTopMarkers();
+      console.log('got top markers ', topMarkers.length);
     }
+
     let stationList = null;
 
     if (errorMessage) {

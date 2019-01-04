@@ -13,6 +13,7 @@ import {
 } from 'native-base';
 
 import LocationAutocomplete from '../LocationAutocomplete';
+import DistanceSlider from '../DistanceSlider';
 import DefaultCoords from '../../constants/DefaultCoords';
 
 const { width } = Dimensions.get('window');
@@ -35,11 +36,28 @@ const styles = StyleSheet.create({
   icon: {
     color: '#37474F',
   },
+  input: {
+    flexGrow: 1,
+  },
 });
 
 export default class MapSearch extends Component {
+  state = {
+    showFilter: false,
+  };
+
   hideAutocomplete = () => {
-    this.autocomplete.hideAutocomplete();
+    if (this.autocomplete) {
+      this.autocomplete.hideAutocomplete();
+    }
+  }
+
+  _toggleFilter = () => {
+    const { showFilter } = this.state;
+
+    this.setState({
+      showFilter: !showFilter,
+    });
   }
 
   render() {
@@ -49,13 +67,34 @@ export default class MapSearch extends Component {
       overrideLocation,
     } = this.props;
 
-    return (
-      <View style={styles.container}>
+    const {
+      showFilter,
+    } = this.state;
+
+    const input = showFilter
+      ? (
+        <DistanceSlider
+          minDistance={100}
+          maxDistance={2000}
+          step={100}
+          value={500}
+        />
+      )
+      : (
         <LocationAutocomplete
+          style={styles.input}
           geocode={geocode}
           ref={(ref) => { this.autocomplete = ref; }}
           overrideLocation={overrideLocation}
         />
+      );
+
+    return (
+      <View style={styles.container}>
+        {input}
+        <Button transparent dark style={styles.button} onPress={this._toggleFilter}>
+          <Icon name={showFilter ? 'search' : 'filter'} type="FontAwesome" style={styles.icon} />
+        </Button>
         <Button transparent dark style={styles.button} onPress={onOpenDrawer}>
           <Icon name="bars" type="FontAwesome" style={styles.icon} />
         </Button>
