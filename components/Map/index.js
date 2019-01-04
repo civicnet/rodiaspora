@@ -18,14 +18,14 @@ const { width, height } = Dimensions.get('window');
 const ASPECT_RATIO = width / height;
 const LATITUDE_DELTA = 0.0922;
 const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
-const HEADER_HEIGHT = 56;
 
 export default class Map extends Component {
   componentDidUpdate(prevProps) {
     const {
       selected,
     } = this.props;
-    if (!prevProps || !this.map) {
+
+    if (!prevProps || !this.map || !selected) {
       return;
     }
 
@@ -90,7 +90,7 @@ export default class Map extends Component {
 
     return (
       <MapView
-        style={{ flex: 1, width, height: height - HEADER_HEIGHT }}
+        style={{ flex: 1, width, height }}
         customMapStyle={Uber}
         initialRegion={{
           latitude: center.latitude,

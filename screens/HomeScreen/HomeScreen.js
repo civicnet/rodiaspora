@@ -21,6 +21,8 @@ import {
 } from 'native-base';
 
 import Directions from '@mapbox/mapbox-sdk/services/directions';
+import Geocoding from '@mapbox/mapbox-sdk/services/geocoding';
+
 import { sha256 } from 'js-sha256';
 import { oneLineTrim } from 'common-tags';
 
@@ -32,6 +34,9 @@ import Geo from '../../lib/Geo';
 import * as MarkerLocations from '../../assets/data/markers-data.json';
 
 const directionsClient = Directions({
+  accessToken: 'pk.eyJ1IjoiY2xhdWRpdWMiLCJhIjoiY2lrZXV5dzNiMDA3NnRvbHlwMWc3ZHp4YiJ9.8DeWMyPr2T8jRDeShSebTQ',
+});
+const geocodingClient = Geocoding({
   accessToken: 'pk.eyJ1IjoiY2xhdWRpdWMiLCJhIjoiY2lrZXV5dzNiMDA3NnRvbHlwMWc3ZHp4YiJ9.8DeWMyPr2T8jRDeShSebTQ',
 });
 
@@ -78,6 +83,7 @@ export default class HomeScreen extends React.Component {
     selectedMarker: null,
     currentDirections: null,
     isCardListHidden: false,
+    currentlyLoading: '',
   }
 
   componentWillMount() {
@@ -88,6 +94,10 @@ export default class HomeScreen extends React.Component {
     } else {
       this._getLocationAsync();
     }
+
+    this.setState({
+      currentlyLoading: 'markers',
+    });
 
     const markers = Object.keys(MarkerLocations).map((key) => {
       const obj = MarkerLocations[key];
@@ -109,6 +119,10 @@ export default class HomeScreen extends React.Component {
   }
 
   _getLocationAsync = async () => {
+    this.setState({
+      currentlyLoading: 'location',
+    });
+
     const { status } = await Permissions.askAsync(Permissions.LOCATION);
     if (status !== 'granted') {
       this.setState({
@@ -121,11 +135,30 @@ export default class HomeScreen extends React.Component {
       enableHighAccuracy: true,
     });
 
-    const locationGeocode = await Location.reverseGeocodeAsync({
-      ...location.coords,
+    this.setState({
+      currentlyLoading: 'geocode',
     });
 
+    const geocodeResponse = await geocodingClient.reverseGeocode({
+      query: [
+        location.coords.longitude,
+        location.coords.latitude,
+      ],
+      limit: 1,
+    }).send();
+
+    const locationGeocode = {
+      city: geocodeResponse.body.features[0].context[0].text,
+      region: geocodeResponse.body.features[0].context[1].text,
+      country: geocodeResponse.body.features[0].context[2].text,
+      address: geocodeResponse.body.features[0].properties.address,
+      name: geocodeResponse.body.features[0].place_name,
+    };
+
     this.setState({ location, locationGeocode });
+    this.setState({
+      currentlyLoading: 'unsure',
+    });
   };
 
   _onSelectedItem = (item) => {
@@ -196,6 +229,7 @@ export default class HomeScreen extends React.Component {
       selectedMarker,
       currentDirections,
       isCardListHidden,
+      currentlyLoading,
     } = this.state;
 
     if (errorMessage) {
@@ -205,7 +239,12 @@ export default class HomeScreen extends React.Component {
     }
 
     if (!location || !location.coords || !locationGeocode || !markers) {
-      return <Spinner />;
+      return (
+        <View style={{ display: 'flex', justifyContent: 'center', alignContent: 'center' }}>
+          <Spinner />
+          <Text>{currentlyLoading}</Text>
+        </View>
+      );
     }
 
     const topMarkers = HomeScreen._calculateOrderedMarkers(

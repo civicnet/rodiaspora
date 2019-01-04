@@ -2,31 +2,52 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import {
+  View,
+  Dimensions,
+  StyleSheet,
+} from 'react-native';
+
+import {
   Button,
   Icon,
-  Item,
-  Input,
-  Header,
 } from 'native-base';
 
+import LocationAutocomplete from '../LocationAutocomplete';
+
+const { width } = Dimensions.get('window');
+
+const styles = StyleSheet.create({
+  container: {
+    position: 'absolute',
+    top: 0,
+    zIndex: 100,
+    flex: 1,
+    width,
+    padding: 8,
+    flexDirection: 'row',
+  },
+  button: {
+    width: 60,
+    flexShrink: 1,
+    alignSelf: 'flex-start',
+  },
+  icon: {
+    color: '#37474F',
+  },
+});
+
 const MapSearch = ({ geocode }) => (
-  <Header searchBar rounded style={{ backgroundColor: '#B0BEC5' }}>
-    <Item>
-      <Icon active name="my-location" type="MaterialIcons" style={{ color: '#29B6F6' }} />
-      <Input placeholder={`${geocode[0].city}, ${geocode[0].country}`} />
-      <Icon name="search" type="FontAwesome" style={{ color: '#37474F' }} />
-    </Item>
-    <Button transparent dark style={{ width: 60 }}>
-      <Icon name="bars" type="FontAwesome" style={{ color: '#37474F' }} />
+  <View style={styles.container}>
+    <LocationAutocomplete geocode={geocode} />
+    <Button transparent dark style={styles.button}>
+      <Icon name="bars" type="FontAwesome" style={styles.icon} />
     </Button>
-  </Header>
+  </View>
 );
 
 MapSearch.propTypes = {
   // eslint-disable-next-line react/forbid-prop-types
-  geocode: PropTypes.array.isRequired,
-  // eslint-disable-next-line react/forbid-prop-types
-  // coords: PropTypes.object.isRequired,
+  geocode: PropTypes.object.isRequired,
 };
 
 export default MapSearch;
