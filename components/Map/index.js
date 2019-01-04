@@ -13,6 +13,7 @@ import polyline from '@mapbox/polyline';
 import Uber from './styles/Uber.json';
 import MapPinOutline from '../../assets/images/vote-s-yellow-alt.png';
 import MapPinSelected from '../../assets/images/vote-s-yellow.png';
+import UserLocationPin from '../../assets/images/user-location-pin.png';
 
 const { width, height } = Dimensions.get('window');
 const ASPECT_RATIO = width / height;
@@ -100,7 +101,6 @@ export default class Map extends Component {
         }}
         onPress={onPress}
         ref={(el) => { this.map = el; }}
-        showsUserLocation
       >
         {markers.map((marker) => {
           const image = selected && marker.id === selected.id
@@ -117,6 +117,11 @@ export default class Map extends Component {
             </MapView.Marker>
           );
         })}
+        <MapView.Marker
+          coordinate={{ ...center }}
+          image={UserLocationPin}
+        >
+        </MapView.Marker>
         {poly}
       </MapView>
     );
