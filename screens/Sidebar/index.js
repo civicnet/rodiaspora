@@ -43,6 +43,10 @@ const routes = [
     route: 'Home',
   },
   {
+    name: 'Avertismente de călătorie',
+    route: 'Alerts',
+  },
+  {
     name: 'Știri',
     route: 'News',
   },
