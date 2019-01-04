@@ -7,7 +7,12 @@ import {
   Dimensions,
   TouchableOpacity,
   Animated,
+  StyleSheet,
 } from 'react-native';
+
+import {
+  Text,
+} from 'native-base';
 
 import { sha256 } from 'js-sha256';
 import VotingStationCard from '../VotingStationCard';
@@ -16,6 +21,29 @@ const { height } = Dimensions.get('window');
 
 const CARD_HEIGHT = height / 4;
 const CARD_WIDTH = 300;
+
+const styles = StyleSheet.create({
+  container: {
+  },
+  markerCount: {
+    fontWeight: 'bold',
+  },
+  distance: {
+    fontWeight: 'bold',
+  },
+  searchResult: {
+    marginLeft: 8,
+  },
+  text: {
+    color: '#000',
+    textShadowColor: '#fff',
+    textShadowOffset: {
+      width: 1,
+      height: 1,
+    },
+    textShadowRadius: 3,
+  },
+});
 
 export default class VotingStationList extends React.Component {
   flatList = null;
@@ -143,6 +171,7 @@ export default class VotingStationList extends React.Component {
   render() {
     const {
       markers,
+      distance,
     } = this.props;
 
     const animatedStyle = {
@@ -153,7 +182,17 @@ export default class VotingStationList extends React.Component {
     };
 
     return (
-      <Animated.View style={animatedStyle}>
+      <Animated.View style={[styles.container, animatedStyle]}>
+        <Text style={[styles.text, styles.searchResult]}>
+          <Text style={[styles.text, styles.markerCount]}>
+            {`${markers.length} `}
+          </Text>
+          stații de vot, la maxim
+          <Text style={[styles.text, styles.distance]}>
+            {` ${distance}`}
+          </Text>
+          km
+        </Text>
         <FlatList
           ref={(list) => {
             this.flatList = list;
@@ -180,6 +219,7 @@ VotingStationList.propTypes = {
   forceShow: PropTypes.func.isRequired,
   // eslint-disable-next-line react/forbid-prop-types
   selected: PropTypes.object,
+  distance: PropTypes.number.isRequired,
 };
 
 VotingStationList.defaultProps = {

@@ -69,6 +69,7 @@ export default class DistanceSlider extends Component {
       maxDistance,
       step,
       style,
+      updateMarkerDistance,
     } = this.props;
 
     return (
@@ -93,10 +94,11 @@ export default class DistanceSlider extends Component {
           minimumValue={minDistance}
           step={step}
           value={distance}
-          onValueChange={val => this.setState({ distance: val })}
           thumbTintColor="#FDD835"
           maximumTrackTintColor="#F57F17"
           minimumTrackTintColor="#FDD835"
+          onSlidingComplete={updateMarkerDistance}
+          onValueChange={value => this.setState({ distance: value })}
         />
       </View>
     );
@@ -110,6 +112,7 @@ DistanceSlider.propTypes = {
   step: PropTypes.number,
   // eslint-disable-next-line react/forbid-prop-types
   style: PropTypes.object,
+  updateMarkerDistance: PropTypes.func.isRequired,
 };
 
 DistanceSlider.defaultProps = {

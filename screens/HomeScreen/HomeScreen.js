@@ -20,6 +20,14 @@ import {
   Container,
   Content,
   Spinner,
+  Button,
+  Text,
+  Card,
+  CardItem,
+  Body,
+  Left,
+  Thumbnail,
+  Icon,
 } from 'native-base';
 
 import Directions from '@mapbox/mapbox-sdk/services/directions';
@@ -35,6 +43,7 @@ import LocationErrorCard from '../../components/LocationErrorCard';
 import Geo from '../../lib/Geo';
 import DefaultCoords from '../../constants/DefaultCoords';
 
+import RadarTower from '../../assets/images/tower.png';
 import * as MarkerLocations from '../../assets/data/markers-data.json';
 
 const directionsClient = Directions({
@@ -51,6 +60,12 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 20,
     left: (width / 2) - 18,
+  },
+  broadSearch: {
+    position: 'absolute',
+    bottom: 20,
+    width: width - 16,
+    left: 8,
   },
 });
 
@@ -116,6 +131,7 @@ export default class HomeScreen extends React.Component {
     selectedMarker: null,
     currentDirections: null,
     isCardListMinimized: false,
+    topMarkerDistance: 250,
   }
 
   componentWillMount() {
@@ -135,12 +151,12 @@ export default class HomeScreen extends React.Component {
   }
 
   _getTopMarkers = () => {
-    const { location } = this.state;
+    const { location, topMarkerDistance } = this.state;
 
     const topMarkers = HomeScreen._calculateOrderedMarkers(
       MARKERS,
       location,
-    ).filter(marker => marker.distance <= 1000 * 1000);
+    ).filter(marker => marker.distance <= 1000 * topMarkerDistance);
 
     return topMarkers;
   }
@@ -268,6 +284,12 @@ export default class HomeScreen extends React.Component {
     });
   }
 
+  _updateTopMarkerDistance = (distance) => {
+    this.setState({
+      topMarkerDistance: distance,
+    });
+  }
+
   render() {
     const {
       errorMessage,
@@ -276,12 +298,12 @@ export default class HomeScreen extends React.Component {
       selectedMarker,
       currentDirections,
       isCardListMinimized,
+      topMarkerDistance,
     } = this.state;
 
     let topMarkers = [];
     if (location) {
       topMarkers = this._getTopMarkers();
-      console.log('got top markers ', topMarkers.length);
     }
 
     let stationList = null;
@@ -290,14 +312,61 @@ export default class HomeScreen extends React.Component {
       stationList = <LocationErrorCard />;
     }
 
-    if (!errorMessage && (!location || !topMarkers.length)) {
+    if (!errorMessage && !location) {
       stationList = <Spinner style={styles.spinner} color="#666" />;
+    }
+
+    if (!errorMessage && !topMarkers.length && location) {
+      stationList = (
+        <View style={styles.broadSearch}>
+          <Card>
+            <CardItem header>
+              <Left>
+                <Thumbnail square source={RadarTower} />
+                <Body>
+                  <Text>Hopa!</Text>
+                  <Text note>
+                    Nu am găsit nicio stație de vot la mai puțin de
+                    {` ${topMarkerDistance}`}
+                    km de
+                    {` ${locationGeocode.city}`}
+                    .
+                  </Text>
+                </Body>
+              </Left>
+            </CardItem>
+            <CardItem body>
+              <Text>
+                Dacă nu cauți secții de vot în apropiere de
+                {` ${locationGeocode.city} `}
+                poți schimba locația mai sus, sau poți mări distanța de căutare.
+              </Text>
+            </CardItem>
+            <CardItem footer>
+              <Button
+                bordered
+                iconLeft
+                style={{ alignSelf: 'center' }}
+                onPress={() => {
+                  this.setState({
+                    topMarkerDistance: topMarkerDistance + 250,
+                  });
+                }}
+              >
+                <Icon name="search-plus" type="FontAwesome" />
+                <Text>Mărește raza de căutare</Text>
+              </Button>
+            </CardItem>
+          </Card>
+        </View>
+      );
     }
 
     if (stationList === null) {
       stationList = (
         <VotingStationList
           markers={topMarkers}
+          distance={topMarkerDistance}
           selected={selectedMarker}
           onSelectedItem={this._onSelectedItem}
           onShowRoute={this._onShowRoute}
@@ -315,6 +384,8 @@ export default class HomeScreen extends React.Component {
           ref={(ref) => { this.mapSearch = ref; }}
           onOpenDrawer={this._openDrawer}
           overrideLocation={this._overrideLocation}
+          updateMarkerDistance={this._updateTopMarkerDistance}
+          distance={topMarkerDistance}
         />
       )
       : (
@@ -322,6 +393,8 @@ export default class HomeScreen extends React.Component {
           ref={(ref) => { this.mapSearch = ref; }}
           onOpenDrawer={this._openDrawer}
           overrideLocation={this._overrideLocation}
+          updateMarkerDistance={this._updateTopMarkerDistance}
+          distance={topMarkerDistance}
         />
       );
 

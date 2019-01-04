@@ -65,6 +65,8 @@ export default class MapSearch extends Component {
       geocode,
       onOpenDrawer,
       overrideLocation,
+      updateMarkerDistance,
+      distance,
     } = this.props;
 
     const {
@@ -77,7 +79,8 @@ export default class MapSearch extends Component {
           minDistance={100}
           maxDistance={2000}
           step={100}
-          value={500}
+          value={distance}
+          updateMarkerDistance={updateMarkerDistance}
         />
       )
       : (
@@ -108,9 +111,12 @@ MapSearch.propTypes = {
   geocode: PropTypes.object,
   onOpenDrawer: PropTypes.func.isRequired,
   overrideLocation: PropTypes.func.isRequired,
+  updateMarkerDistance: PropTypes.func.isRequired,
+  distance: PropTypes.number,
 };
 
 MapSearch.defaultProps = {
+  distance: 500,
   geocode: {
     city: null,
     country: null,
