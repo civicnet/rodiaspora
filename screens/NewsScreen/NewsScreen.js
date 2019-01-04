@@ -10,13 +10,27 @@ import {
 
 import {
   StatusBar,
+  StyleSheet,
 } from 'react-native';
+
+import SecondaryPageHeader from '../../components/SecondaryPageHeader';
+
+const styles = StyleSheet.create({
+  container: {
+    backgroundColor: '#CFD8DC',
+  },
+});
 
 const NewsScreen = ({ navigation }) => (
   <Container>
     <StatusBar hidden />
-    <Content>
-      <Text>Stiri</Text>
+    <SecondaryPageHeader
+      title="Știri"
+      onOpenDrawer={() => navigation.toggleDrawer()}
+      goBack={() => navigation.goBack()}
+    />
+    <Content style={styles.container}>
+      <Text>Știri</Text>
       <Button onPress={() => navigation.navigate('Home')}>
         <Text>Home</Text>
       </Button>

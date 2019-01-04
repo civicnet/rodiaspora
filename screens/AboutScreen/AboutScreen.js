@@ -10,12 +10,26 @@ import {
 
 import {
   StatusBar,
+  StyleSheet,
 } from 'react-native';
+
+import SecondaryPageHeader from '../../components/SecondaryPageHeader';
+
+const styles = StyleSheet.create({
+  container: {
+    backgroundColor: '#CFD8DC',
+  },
+});
 
 const AboutScreen = ({ navigation }) => (
   <Container>
     <StatusBar hidden />
-    <Content>
+    <SecondaryPageHeader
+      title="RODiaspora"
+      onOpenDrawer={() => navigation.toggleDrawer()}
+      goBack={() => navigation.goBack()}
+    />
+    <Content style={styles.container}>
       <Text>Despre</Text>
       <Button onPress={() => navigation.navigate('Home')}>
         <Text>Home</Text>
