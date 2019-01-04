@@ -60,6 +60,14 @@ export default class MapSearch extends Component {
 
 MapSearch.propTypes = {
   // eslint-disable-next-line react/forbid-prop-types
-  geocode: PropTypes.object.isRequired,
+  geocode: PropTypes.object,
   onOpenDrawer: PropTypes.func.isRequired,
+};
+
+MapSearch.defaultProps = {
+  geocode: {
+    city: null,
+    country: null,
+    placeholder: 'Unde vrei să votezi?',
+  },
 };

@@ -102,13 +102,9 @@ export default class LocationAutocomplete extends Component {
   }
 
   _onResetLocation = () => {
-    const { geocode } = this.props;
-
-    if (geocode) {
-      this.setState({
-        autoLocation: `${geocode.city}, ${geocode.country}`,
-      });
-    }
+    this.setState({
+      autoLocation: this._geocodeToString(),
+    });
   }
 
   _clearAutoLocation = () => {
@@ -162,11 +158,15 @@ export default class LocationAutocomplete extends Component {
     Keyboard.dismiss();
   }
 
-  render() {
-    const {
-      geocode,
-    } = this.props;
+  _geocodeToString = () => {
+    const { geocode } = this.props;
 
+    return (geocode.city && geocode.country)
+      ? `${geocode.city}, ${geocode.country}`
+      : geocode.placeholder;
+  };
+
+  render() {
     const {
       autoLocation,
       suggestions,
@@ -205,7 +205,7 @@ export default class LocationAutocomplete extends Component {
           <Input
             style={styles.input}
             onChangeText={this._onTextChange}
-            placeholder={`${geocode.city}, ${geocode.country}`}
+            placeholder={this._geocodeToString()}
             ref={(ref) => { this.input = ref; }}
             value={autoLocation}
             onFocus={this._clearAutoLocation}

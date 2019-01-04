@@ -14,6 +14,7 @@ import Uber from './styles/Uber.json';
 import MapPinOutline from '../../assets/images/vote-s-yellow-alt.png';
 import MapPinSelected from '../../assets/images/vote-s-yellow.png';
 import UserLocationPin from '../../assets/images/user-location-pin.png';
+import ErrorLocationPin from '../../assets/images/not-found.png';
 
 const { width, height } = Dimensions.get('window');
 const ASPECT_RATIO = width / height;
@@ -57,6 +58,7 @@ export default class Map extends Component {
       selected,
       showDirections,
       onPress,
+      isError,
     } = this.props;
 
     if (!markers || !center) {
@@ -119,7 +121,7 @@ export default class Map extends Component {
         })}
         <MapView.Marker
           coordinate={{ ...center }}
-          image={UserLocationPin}
+          image={!isError ? UserLocationPin : ErrorLocationPin}
         >
         </MapView.Marker>
         {poly}
@@ -139,6 +141,7 @@ Map.propTypes = {
   showDirections: PropTypes.object,
   onPress: PropTypes.func.isRequired,
   onSelectedItem: PropTypes.func.isRequired,
+  isError: PropTypes.bool.isRequired,
 };
 
 Map.defaultProps = {

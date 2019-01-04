@@ -6,6 +6,8 @@ import {
   Icon,
 } from 'expo';
 
+import { Root } from 'native-base';
+
 import HomeScreen from './screens/HomeScreen';
 
 export default class App extends React.Component {
@@ -54,6 +56,10 @@ export default class App extends React.Component {
       );
     }
 
-    return <HomeScreen />;
+    return (
+      <Root>
+        <HomeScreen />
+      </Root>
+    );
   }
 }

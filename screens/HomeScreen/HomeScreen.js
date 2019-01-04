@@ -6,6 +6,8 @@ import {
   View,
   StatusBar,
   AsyncStorage,
+  Dimensions,
+  StyleSheet,
 } from 'react-native';
 
 import {
@@ -16,9 +18,8 @@ import {
 
 import {
   Container,
-  Text,
-  Spinner,
   Content,
+  Spinner,
 } from 'native-base';
 
 import Directions from '@mapbox/mapbox-sdk/services/directions';
@@ -30,6 +31,7 @@ import { oneLineTrim } from 'common-tags';
 import Map from '../../components/Map';
 import MapSearch from '../../components/MapSearch';
 import VotingStationList from '../../components/VotingStationList';
+import LocationErrorCard from '../../components/LocationErrorCard';
 import Geo from '../../lib/Geo';
 
 import * as MarkerLocations from '../../assets/data/markers-data.json';
@@ -39,6 +41,16 @@ const directionsClient = Directions({
 });
 const geocodingClient = Geocoding({
   accessToken: 'pk.eyJ1IjoiY2xhdWRpdWMiLCJhIjoiY2lrZXV5dzNiMDA3NnRvbHlwMWc3ZHp4YiJ9.8DeWMyPr2T8jRDeShSebTQ',
+});
+
+const { width } = Dimensions.get('window');
+
+const styles = StyleSheet.create({
+  spinner: {
+    position: 'absolute',
+    bottom: 20,
+    left: (width / 2) - 18,
+  },
 });
 
 export default class HomeScreen extends React.Component {
@@ -84,7 +96,6 @@ export default class HomeScreen extends React.Component {
     selectedMarker: null,
     currentDirections: null,
     isCardListMinimized: false,
-    currentlyLoading: '',
   }
 
   componentWillMount() {
@@ -95,10 +106,6 @@ export default class HomeScreen extends React.Component {
     } else {
       this._getLocationAsync();
     }
-
-    this.setState({
-      currentlyLoading: 'markers',
-    });
 
     const markers = Object.keys(MarkerLocations).map((key) => {
       const obj = MarkerLocations[key];
@@ -120,25 +127,28 @@ export default class HomeScreen extends React.Component {
   }
 
   _getLocationAsync = async () => {
-    this.setState({
-      currentlyLoading: 'location',
-    });
-
     const { status } = await Permissions.askAsync(Permissions.LOCATION);
     if (status !== 'granted') {
       this.setState({
-        errorMessage: 'Permission to access location was denied',
+        errorMessage: 'Nu am primit permisiunea de a accesa locația',
       });
       return;
     }
 
-    const location = await Location.getCurrentPositionAsync({
-      enableHighAccuracy: true,
-    });
+    let location = null;
+    try {
+      location = await Location.getCurrentPositionAsync({
+        enableHighAccuracy: true,
+      });
+    } catch (e) {
+      this.setState({
+        errorMessage: 'Te rugăm pornește serviciile de localizare',
+      });
+    }
 
-    this.setState({
-      currentlyLoading: 'geocode',
-    });
+    if (!location) {
+      return;
+    }
 
     const geocodeResponse = await geocodingClient.reverseGeocode({
       query: [
@@ -157,9 +167,6 @@ export default class HomeScreen extends React.Component {
     };
 
     this.setState({ location, locationGeocode });
-    this.setState({
-      currentlyLoading: 'unsure',
-    });
   };
 
   _onSelectedItem = (item) => {
@@ -240,56 +247,76 @@ export default class HomeScreen extends React.Component {
       selectedMarker,
       currentDirections,
       isCardListMinimized,
-      currentlyLoading,
     } = this.state;
 
+    const defaultCoords = {
+      latitude: 48.0994207,
+      longitude: 4.1512819,
+    };
+
+    let topMarkers = [];
+    if (location) {
+      topMarkers = HomeScreen._calculateOrderedMarkers(
+        markers,
+        location,
+      ).filter(marker => marker.distance <= 1000 * 500);
+    }
+
+    let stationList = null;
+
     if (errorMessage) {
-      return (
-        <Text>{errorMessage}</Text>
+      stationList = <LocationErrorCard />;
+    }
+
+    if (!errorMessage && (!location || !topMarkers.length)) {
+      stationList = <Spinner style={styles.spinner} color="#666" />;
+    }
+
+    if (stationList === null) {
+      stationList = (
+        <VotingStationList
+          markers={topMarkers}
+          selected={selectedMarker}
+          onSelectedItem={this._onSelectedItem}
+          onShowRoute={this._onShowRoute}
+          showDirections={currentDirections}
+          hidden={isCardListMinimized}
+          forceShow={this._forceShowCardList}
+        />
       );
     }
 
-    if (!location || !location.coords || !locationGeocode || !markers) {
-      return (
-        <View style={{ display: 'flex', justifyContent: 'center', alignContent: 'center' }}>
-          <Spinner />
-          <Text>{currentlyLoading}</Text>
-        </View>
-      );
-    }
-
-    const topMarkers = HomeScreen._calculateOrderedMarkers(
-      markers,
-      location,
-    ).filter(marker => marker.distance <= 1000 * 500);
-
-    return (
-      <Container>
-        <StatusBar hidden />
+    const mapSearch = locationGeocode
+      ? (
         <MapSearch
           geocode={locationGeocode}
           ref={(ref) => { this.mapSearch = ref; }}
           onOpenDrawer={this._openDrawer}
         />
+      )
+      : (
+        <MapSearch
+          ref={(ref) => { this.mapSearch = ref; }}
+          onOpenDrawer={this._openDrawer}
+        />
+      );
+
+    return (
+      <Container>
+        <StatusBar hidden />
+        { mapSearch }
         <Content style={{ flex: 1 }}>
           <View style={{ flex: 1 }}>
             <Map
               markers={topMarkers}
-              center={location.coords}
+              center={location ? location.coords : defaultCoords}
               selected={selectedMarker}
               onSelectedItem={this._onSelectedItem}
               showDirections={currentDirections}
               onPress={this._onMapPress}
+              isError={false}
             />
-            <VotingStationList
-              markers={topMarkers}
-              selected={selectedMarker}
-              onSelectedItem={this._onSelectedItem}
-              onShowRoute={this._onShowRoute}
-              showDirections={currentDirections}
-              hidden={isCardListMinimized}
-              forceShow={this._forceShowCardList}
-            />
+            { stationList }
           </View>
         </Content>
       </Container>
