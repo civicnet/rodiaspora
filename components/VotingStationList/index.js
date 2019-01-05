@@ -47,6 +47,8 @@ const styles = StyleSheet.create({
   },
 });
 
+const CARD_COLOR_COUNT = 8;
+
 export default class VotingStationList extends React.Component {
   flatList = null;
 
@@ -73,7 +75,7 @@ export default class VotingStationList extends React.Component {
     if (markers.length) {
       this.cardColors = chroma
         .scale(['#91cf60', '#ffffbf', '#fc8d59'])
-        .colors(markers.length);
+        .classes(CARD_COLOR_COUNT);
     }
 
     if (hidden && !prevProps.hidden) {
@@ -134,11 +136,13 @@ export default class VotingStationList extends React.Component {
 
     const {
       onShowRoute,
+      // markers,
     } = this.props;
 
-    const color = this.cardColors
-      ? chroma(this.cardColors[index]).darken(3).toString()
-      : '#000';
+    // const countMarkers = markers.length ? markers.length : 1;
+    /* const color = this.cardColors
+      ? chroma(this.cardColors[index / countMarkers]).darken(3).toString()
+      : '#000'; */
 
     return (
       <TouchableOpacity onPress={() => this._onChangeSelected(item, index)}>
@@ -149,7 +153,7 @@ export default class VotingStationList extends React.Component {
             name={item.name}
             address={item.address}
             country={item.country}
-            color={color}
+            color="#000"
             distance={Math.floor(item.distance / 1000)}
             coords={{ latitude: item.latitude, longitude: item.longitude }}
             onShowRoute={(target, pos) => {
