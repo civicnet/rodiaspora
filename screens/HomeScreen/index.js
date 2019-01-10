@@ -25,7 +25,8 @@ const HomeScreenRouter = createDrawerNavigator(
   },
   {
     contentComponent: props => <Sidebar {...props} />,
-    drawerPosition: 'right',
+    drawerPosition: 'left',
+    initialRouteName: 'Home',
   },
 );
 export default HomeScreenRouter;
