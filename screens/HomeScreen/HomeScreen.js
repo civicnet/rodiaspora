@@ -193,12 +193,19 @@ export default class HomeScreen extends React.Component {
       limit: 1,
     }).send();
 
+    // console.log(geocodeResponse);
+    // TODO: handle multiple feature results
+    const geocodingFeature = geocodeResponse.body.features[0];
+    const geocodeContext = this._parseGeocodeContext(
+      geocodingFeature.context,
+    );
+
     const locationGeocode = {
-      city: geocodeResponse.body.features[0].context[0].text,
-      region: geocodeResponse.body.features[0].context[1].text,
-      country: geocodeResponse.body.features[0].context[2].text,
-      address: geocodeResponse.body.features[0].properties.address,
-      name: geocodeResponse.body.features[0].place_name,
+      city: this._getContextFeatureByKey('city', geocodeContext),
+      region: this._getContextFeatureByKey('region', geocodeContext),
+      country:  this._getContextFeatureByKey('country', geocodeContext),
+      address: geocodingFeature.properties.address,
+      name: geocodingFeature.place_name,
       coords: {
         longitude: location.coords.longitude,
         latitude: location.coords.latitude,
@@ -207,6 +214,29 @@ export default class HomeScreen extends React.Component {
 
     this.setState({ location, locationGeocode });
   };
+
+  _getContextFeatureByKey = (key, parsedContext) => {
+    for (let i = 0; i < parsedContext.length; i++) {
+      // console.log('searching ', key, ' in ', parsedContext[i]);
+      if (parsedContext[i].type === key) {
+        // console.log(parsedContext[i])
+        return parsedContext[i].text;
+      }
+    }
+
+    return null;
+  }
+
+  _parseGeocodeContext = (context) => {
+    // console.log(context);
+    return context.map(({ id, text }) => {
+      const pieces = id.split('.');
+      return {
+        type: pieces[0],
+        text,
+      }
+    });
+  }
 
   _onSelectedItem = (item) => {
     this.setState({

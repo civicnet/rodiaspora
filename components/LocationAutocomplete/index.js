@@ -180,11 +180,24 @@ export default class LocationAutocomplete extends Component {
     );
   }
 
+  // TODO: Fix this mess (location formatting)
   _geocodeToString = () => {
     const { geocode } = this.props;
+    const {
+      city,
+      region,
+      country,
+    } = geocode;
 
-    return (geocode.city && geocode.country)
-      ? `${geocode.city}, ${geocode.country}`
+    const format = (entity) => {
+      return entity
+        ? `${entity}, `
+        : '';
+    }
+
+    const location = `${format(city)}${format(region)}${format(country)}`;
+    return !geocode.placeholder
+      ? location.substring(0, location.length - 2)
       : geocode.placeholder;
   };
 
