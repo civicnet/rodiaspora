@@ -20,11 +20,15 @@ import {
   StyleSheet,
   Image,
   FlatList,
+  Dimensions,
 } from 'react-native';
 
 import {
   WebBrowser,
 } from 'expo';
+
+import { DangerZone } from 'expo';
+let { Lottie } = DangerZone;
 
 import he from 'he';
 
@@ -34,13 +38,15 @@ import 'moment/locale/ro';
 import { parseString } from 'react-native-xml2js';
 
 import SecondaryPageHeader from '../../components/SecondaryPageHeader';
-import Flickr from '../../lib/Flickr';
 
 import LogoMAE from '../../assets/images/logo-mae.png';
+
+const { width } = Dimensions.get('window');
 
 const styles = StyleSheet.create({
   container: {
     backgroundColor: '#CFD8DC',
+    flex: 1,
   },
   cardPhoto: {
     height: 160,
@@ -49,13 +55,13 @@ const styles = StyleSheet.create({
   },
 });
 
-const FEED = 'http://www.mae.ro/warnings/feed';
+const FEED = 'http://www.mae.ro/rss.xml';
 
 moment.locale('ro');
 
 export default class NewsScreen extends Component {
   state = {
-    alerts: [],
+    items: [],
   }
 
   async componentWillMount() {
@@ -63,35 +69,41 @@ export default class NewsScreen extends Component {
     const body = await feed.text();
 
     parseString(body, async (err, result) => {
-      const parsedAlerts = result.rss.channel[0].item.map(
+      const parsedItems = result.rss.channel[0].item.map(
         async item => ({
-          tags: item.category.map((category) => {
-            // For some reason, MAE applies one lowercase and one uppercase tag, identical.
-            // Only the lowercase one has a relatively valid link to mae.ro
-            if (category._ === category._.toUpperCase()) {
-              return null;
-            }
+          tags: item.category
+            ? item.category.map((category) => {
+                // For some reason, MAE applies one lowercase and one uppercase tag, identical.
+                // Only the lowercase one has a relatively valid link to mae.ro
+                if (category._ === category._.toUpperCase()) {
+                  return null;
+                }
 
-            return {
-              name: category._,
-              url: category.$.domain,
-            };
-          }).filter(tag => tag !== null),
-          description: item.description[0],
-          url: item.link[0],
-          title: item.title[0],
-          date: item.pubDate[0],
-          photo: await Flickr.getCountryPhoto(item.title[0]),
-        }),
-      );
+                return {
+                  name: category._,
+                  url: category.$.domain,
+                };
+              }).filter(tag => tag !== null)
+            : [],
+            description: item.description[0],
+            url: item.link[0],
+            title: item.title[0],
+            date: item.pubDate[0],
+            photo: item.enclosure ? item.enclosure[0].$.url : null,
+          }),
+        );
 
-      const resolvedAlerts = await Promise.all(parsedAlerts);
-      const alerts = resolvedAlerts.sort((a, b) => new Date(b.date) - new Date(a.date));
+      const resolvedItems = await Promise.all(parsedItems);
+      const items = resolvedItems.sort((a, b) => new Date(b.date) - new Date(a.date));
 
       this.setState({
-        alerts,
+        items,
       });
     });
+  }
+
+  componentDidMount = () => {
+    this.animation && this.animation.play();
   }
 
   _handleWebLinkPress = (url) => {
@@ -104,14 +116,22 @@ export default class NewsScreen extends Component {
     } = this.props;
 
     const {
-      alerts,
+      items,
     } = this.state;
 
-    const alertsView = alerts.map((alert) => {
+    const animation = (
+      <Lottie
+        ref={animation => { this.animation = animation }}
+        style={{ width: width - 16, height: width / 2, alignSelf: 'center', marginTop: 80 }}
+        source={require('../../assets/animations/loading.json')}
+      />
+    );
+
+    const itemsView = items.map((item) => {
       // Every description includes a paragraph
       // with a "read more" anchor - remove that
       const description = he.decode(
-        alert.description,
+        item.description,
       ).replace(/(<a.*<\/a>|<p.*<\/p>)/g, '');
 
       return (
@@ -120,23 +140,27 @@ export default class NewsScreen extends Component {
             <Left>
               <Thumbnail source={LogoMAE} />
               <Body>
-                <Text>{alert.title}</Text>
-                <Text note>{moment(alert.date).fromNow()}</Text>
+                <Text>{item.title}</Text>
+                <Text note>{moment(item.date).fromNow()}</Text>
               </Body>
             </Left>
           </CardItem>
           <CardItem bordered>
             <Body>
-              <Image
-                source={{ uri: alert.photo }}
-                style={styles.cardPhoto}
-              />
+              {
+                item.photo
+                  ? <Image
+                      source={{ uri: item.photo }}
+                      style={styles.cardPhoto}
+                    />
+                  : null
+              }
               <Text style={{ marginTop: 16 }}>{description}</Text>
             </Body>
           </CardItem>
           <CardItem bordered>
             <FlatList
-              data={alert.tags}
+              data={item.tags}
               horizontal
               keyExtractor={tag => tag.name}
               renderItem={({ item }) => (
@@ -171,7 +195,7 @@ export default class NewsScreen extends Component {
               <Button
                 transparent
                 iconLeft
-                onPress={() => this._handleWebLinkPress(alert.url)}
+                onPress={() => this._handleWebLinkPress(item.url)}
               >
                 <Icon active name="external-link" type="FontAwesome" />
                 <Text>Citește</Text>
@@ -200,7 +224,7 @@ export default class NewsScreen extends Component {
           goBack={() => navigation.goBack()}
         />
         <Content style={styles.container} padder>
-          {alertsView}
+          { itemsView.length ? itemsView : animation }
         </Content>
       </Container>
     );
