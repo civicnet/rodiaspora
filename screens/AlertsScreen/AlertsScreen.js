@@ -11,13 +11,9 @@ import {
   StyleSheet,
 } from 'react-native';
 
-import he from 'he';
-
-import { parseString } from 'react-native-xml2js';
-
 import SecondaryPageHeader from '../../components/SecondaryPageHeader';
-import Flickr from '../../lib/Flickr';
 import RSSItem from '../../components/RSSItem';
+import { getFeed } from '../../lib/RSS';
 
 import LogoMAE from '../../assets/images/logo-mae.png';
 
@@ -32,48 +28,17 @@ const styles = StyleSheet.create({
   },
 });
 
-const FEED = 'http://www.mae.ro/warnings/feed';
-
 export default class AlertsScreen extends Component {
   state = {
     alerts: [],
   }
 
   async componentWillMount() {
-    const feed = await fetch(FEED);
-    const body = await feed.text();
-
-    parseString(body, async (err, result) => {
-      const parsedAlerts = result.rss.channel[0].item.map(
-        async item => ({
-          tags: item.category.map((category) => {
-            // For some reason, MAE applies one lowercase and one uppercase tag, identical.
-            // Only the lowercase one has a relatively valid link to mae.ro
-            if (category._ === category._.toUpperCase()) {
-              return null;
-            }
-
-            return {
-              name: category._,
-              url: category.$.domain,
-            };
-          }).filter(tag => tag !== null),
-          // Every description includes a paragraph
-          // with a "read more" anchor - remove that
-          description: he.decode(item.description[0]).replace(/(<a.*<\/a>|<p.*<\/p>)/g, ''),
-          url: item.link[0],
-          title: item.title[0],
-          date: item.pubDate[0],
-          photo: await Flickr.getCountryPhoto(item.title[0]),
-        }),
-      );
-
-      const resolvedAlerts = await Promise.all(parsedAlerts);
-      const alerts = resolvedAlerts.sort((a, b) => new Date(b.date) - new Date(a.date));
-
-      this.setState({
-        alerts,
-      });
+    await getFeed({
+      feedURL: 'http://www.mae.ro/warnings/feed',
+      useFlickr: true
+    }, (alerts) => {
+      this.setState({ alerts });
     });
   }
 
