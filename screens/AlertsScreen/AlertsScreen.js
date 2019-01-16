@@ -3,38 +3,21 @@ import PropTypes from 'prop-types';
 
 import {
   Container,
-  Text,
   Content,
-  Button,
-  Card,
-  CardItem,
-  Thumbnail,
-  Icon,
-  Left,
-  Body,
-  Right,
 } from 'native-base';
 
 import {
   StatusBar,
   StyleSheet,
-  Image,
-  FlatList,
 } from 'react-native';
 
-import {
-  WebBrowser,
-} from 'expo';
-
 import he from 'he';
-
-import moment from 'moment';
-import 'moment/locale/ro';
 
 import { parseString } from 'react-native-xml2js';
 
 import SecondaryPageHeader from '../../components/SecondaryPageHeader';
 import Flickr from '../../lib/Flickr';
+import RSSItem from '../../components/RSSItem';
 
 import LogoMAE from '../../assets/images/logo-mae.png';
 
@@ -50,8 +33,6 @@ const styles = StyleSheet.create({
 });
 
 const FEED = 'http://www.mae.ro/warnings/feed';
-
-moment.locale('ro');
 
 export default class AlertsScreen extends Component {
   state = {
@@ -77,7 +58,9 @@ export default class AlertsScreen extends Component {
               url: category.$.domain,
             };
           }).filter(tag => tag !== null),
-          description: item.description[0],
+          // Every description includes a paragraph
+          // with a "read more" anchor - remove that
+          description: he.decode(item.description[0]).replace(/(<a.*<\/a>|<p.*<\/p>)/g, ''),
           url: item.link[0],
           title: item.title[0],
           date: item.pubDate[0],
@@ -94,10 +77,6 @@ export default class AlertsScreen extends Component {
     });
   }
 
-  _handleWebLinkPress = (url) => {
-    WebBrowser.openBrowserAsync(url);
-  }
-
   render() {
     const {
       navigation,
@@ -107,89 +86,7 @@ export default class AlertsScreen extends Component {
       alerts,
     } = this.state;
 
-    const alertsView = alerts.map((alert) => {
-      // Every description includes a paragraph
-      // with a "read more" anchor - remove that
-      const description = he.decode(
-        alert.description,
-      ).replace(/(<a.*<\/a>|<p.*<\/p>)/g, '');
-
-      return (
-        <Card key={Math.random()} style={{ flex: 0 }}>
-          <CardItem bordered>
-            <Left>
-              <Thumbnail source={LogoMAE} />
-              <Body>
-                <Text>{alert.title}</Text>
-                <Text note>{moment(alert.date).fromNow()}</Text>
-              </Body>
-            </Left>
-          </CardItem>
-          <CardItem bordered>
-            <Body>
-              <Image
-                source={{ uri: alert.photo }}
-                style={styles.cardPhoto}
-              />
-              <Text style={{ marginTop: 16 }}>{description}</Text>
-            </Body>
-          </CardItem>
-          <CardItem bordered>
-            <FlatList
-              data={alert.tags}
-              horizontal
-              keyExtractor={tag => tag.name}
-              renderItem={({ item }) => (
-                <Button
-                  bordered
-                  iconLeft
-                  info
-                  style={{ marginRight: 16 }}
-                  onPress={() => this._handleWebLinkPress(item.url)}
-                >
-                  <Icon
-                    active
-                    name="external-link"
-                    type="FontAwesome"
-                    style={{ fontSize: 12 }}
-                  />
-                  <Text style={{ fontSize: 12 }}>
-                    {item.name}
-                  </Text>
-                </Button>
-              )}
-            />
-          </CardItem>
-          <CardItem>
-            <Left>
-              <Button transparent iconLeft>
-                <Icon active name="share-alt" type="FontAwesome" />
-                <Text>Distribuie</Text>
-              </Button>
-            </Left>
-            <Body>
-              <Button
-                transparent
-                iconLeft
-                onPress={() => this._handleWebLinkPress(alert.url)}
-              >
-                <Icon active name="external-link" type="FontAwesome" />
-                <Text>Citește</Text>
-              </Button>
-            </Body>
-            <Right>
-              <Button
-                transparent
-                info
-                onPress={() => this._handleWebLinkPress('http://www.mae.ro/')}
-              >
-                <Text style={{ fontSize: 10 }}>www.mae.ro</Text>
-              </Button>
-            </Right>
-          </CardItem>
-        </Card>
-      );
-    });
+    const alertsView = alerts.map(item => <RSSItem logo={ LogoMAE } key={Math.random()} { ...item } />);
 
     return (
       <Container>
