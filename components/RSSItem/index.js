@@ -19,9 +19,7 @@ import {
   Right,
 } from 'native-base';
 
-import {
-  WebBrowser,
-} from 'expo';
+import * as WebBrowser from 'expo-web-browser';
 
 import moment from 'moment';
 import 'moment/locale/ro';
@@ -111,7 +109,6 @@ const RSSItem = ({ title, date, photo, tags, url, style, description, logo }) =>
         <Right>
           <Button
             transparent
-            info
             onPress={() => handleWebLinkPress('http://www.mae.ro/')}
           >
             <Text style={{ fontSize: 10 }}>www.mae.ro</Text>

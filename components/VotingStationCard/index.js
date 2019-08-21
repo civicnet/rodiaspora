@@ -113,7 +113,7 @@ export default class VotingStationCard extends Component {
             <Text note>{`${country}, approx. ${distance} km`}</Text>
           </View>
           <Right style={{ flexShrink: 1 }}>
-            <Button iconLeft transparent primary onPress={() => onShowRoute(coords)}>
+            <Button iconLeft transparent onPress={() => onShowRoute(coords)}>
               <Icon name="ellipsis-v" type="FontAwesome" />
             </Button>
           </Right>

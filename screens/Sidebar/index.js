@@ -94,7 +94,7 @@ const Sidebar = ({ navigation }) => (
     <Footer>
       <FooterTab style={styles.footerTab}>
         <Text style={styles.footerText}>
-          Copyright @ 2019 / CivicTech România
+          Copyright @ 2019 / CivicNet
         </Text>
       </FooterTab>
     </Footer>

@@ -127,7 +127,7 @@ export default class VotingStationList extends React.Component {
     index,
   });
 
-  _keyExtractor = item => sha256(item.name)
+  _keyExtractor = item => item.id
 
   _renderCard = ({ item, index }) => {
     const {

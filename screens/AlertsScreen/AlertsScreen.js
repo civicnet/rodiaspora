@@ -12,8 +12,7 @@ import {
   Dimensions,
 } from 'react-native';
 
-import { DangerZone } from 'expo';
-let { Lottie } = DangerZone;
+import Lottie from 'lottie-react-native';
 
 import SecondaryPageHeader from '../../components/SecondaryPageHeader';
 import RSSItem from '../../components/RSSItem';

@@ -1,11 +1,10 @@
 import React from 'react';
 
-import {
-  AppLoading,
-  Font,
-  Icon,
-  Asset,
-} from 'expo';
+import { AppLoading } from 'expo';
+
+import { Asset } from 'expo-asset';
+import * as Icon from '@expo/vector-icons';
+import * as Font from 'expo-font';
 
 import { Root } from 'native-base';
 

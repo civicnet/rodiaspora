@@ -95,10 +95,10 @@ export default class MapSearch extends Component {
     return (
       <View style={styles.container}>
         {input}
-        <Button transparent dark style={styles.button} onPress={this._toggleFilter}>
+        <Button transparent style={styles.button} onPress={this._toggleFilter}>
           <Icon name={showFilter ? 'search' : 'filter'} type="FontAwesome" style={styles.icon} />
         </Button>
-        <Button transparent dark style={styles.button} onPress={onOpenDrawer}>
+        <Button transparent style={styles.button} onPress={onOpenDrawer}>
           <Icon name="bars" type="FontAwesome" style={styles.icon} />
         </Button>
       </View>

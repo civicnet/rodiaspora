@@ -42,11 +42,11 @@ const styles = StyleSheet.create({
 
 const SecondaryPageHeader = ({ goBack, onOpenDrawer, title }) => (
   <View style={styles.container}>
-    <Button transparent dark style={styles.button} onPress={goBack}>
+    <Button transparent style={styles.button} onPress={goBack}>
       <Icon name="chevron-left" type="FontAwesome" style={styles.icon} />
     </Button>
     <Text style={styles.title}>{title}</Text>
-    <Button transparent dark style={styles.button} onPress={onOpenDrawer}>
+    <Button transparent style={styles.button} onPress={onOpenDrawer}>
       <Icon name="bars" type="FontAwesome" style={styles.icon} />
     </Button>
   </View>

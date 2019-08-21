@@ -5,9 +5,7 @@ import {
   Dimensions,
 } from 'react-native';
 
-import {
-  MapView,
-} from 'expo';
+import MapView from 'react-native-maps';
 import polyline from '@mapbox/polyline';
 
 import Uber from './styles/Uber.json';
