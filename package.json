@@ -29,7 +29,7 @@
     "invert-color": "^2.0.0",
     "js-sha256": "^0.9.0",
     "lottie-react-native": "~2.6.1",
-    "moment": "^2.23.0",
+    "moment": "^2.29.4",
     "native-base": "^2.13.0",
     "prop-types": "^15.6.2",
     "react": "16.8.3",
